@@ -53,7 +53,7 @@ Place Holder Test
 ## Configurations and Test Data
 QATLibrary requires a CSV file with required data to drive the tests. Config yaml or .py files can inject your desired
 configurations during runtime.
-* [Sample Config Yaml](sample/config.yaml) [required to inject runtime configurations]
+* [Sample Config Yaml](sample/config.yaml): Required to inject runtime configurations
 ```yaml
 host: httpbin.org 
 
@@ -78,7 +78,7 @@ oauth1_app_secret:
 oauth1_user_token:
 oauth1_user_token_secret:
 ```
-* [CSV Test Data](sample/Tests.csv) [Test cases/data file. Test cases gets generated based on this file's data.]
+* [CSV Test Data](sample/Tests.csv): Test cases/data file. Test cases gets generated based on this file's data
 
 
 ## Contributing
