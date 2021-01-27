@@ -84,7 +84,7 @@ oauth1_user_token_secret:
 ## Contributing
 This is [Sharif Rahman](https://www.linkedin.com/in/sharif-rahman/). 
 
-``QATLibrary`` is on [GitHub](https://github.com/sharif314/QATLibrary)
+QATLibrary is on [GitHub](https://github.com/sharif314/QATLibrary). 
 Get in touch, via GitHub or otherwise, if you've got something to contribute, it'd be most welcome! 
 Please follow the [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
