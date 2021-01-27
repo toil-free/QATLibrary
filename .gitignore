@@ -1,0 +1,7 @@
+.idea
+dist
+build
+venv
+src/QATLibrary.egg-info
+src/QATLibrary/__pycache__
+

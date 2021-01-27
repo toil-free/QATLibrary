@@ -1,0 +1,25 @@
+---
+# Required args
+host: httpbin.org
+
+# Additional config
+timeout: 2
+allow_redirects:
+stream:
+http_proxy:
+https_proxy:
+
+# SSL Config
+verify_server_cert: True
+certificate:
+private_key:
+
+# Required if using Basic/Digest Auth
+authUser:
+authPass:
+
+# Required if using OAuth1 auth
+oauth1_app_key:
+oauth1_app_secret:
+oauth1_user_token:
+oauth1_user_token_secret:
