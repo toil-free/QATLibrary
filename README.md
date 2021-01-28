@@ -55,7 +55,7 @@ QATLibrary requires a CSV file with required data to drive the tests. Config yam
 configurations during runtime.
 * [Sample Config Yaml](sample/config.yaml): Required to inject runtime configurations
 ```yaml
-host: httpbin.org 
+host: httpbin.org           # Required
 
 #optional args
 timeout: 5                  # Default 5 seconds
