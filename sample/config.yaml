@@ -1,24 +1,22 @@
 ---
-# Required args
-host: httpbin.org
+host: httpbin.org           # Required
 
-# Additional config
-timeout: 2
-allow_redirects:
-stream:
-http_proxy:
-https_proxy:
+#optional args
+timeout: 5                  # Default 5 seconds
+allow_redirects:            # Allow Redirects. Default True. 
+stream:                     # True/False. 
+http_proxy:                 # HTTP Proxy. Default None. 
+https_proxy:                # HTTPS Proxy. Default None.
 
-# SSL Config
-verify_server_cert: True
-certificate:
-private_key:
+verify_server_cert: True    # True/False or path to CA Bundle. Default False. 
+certificate:                # .pem format certificate. Default None
+private_key:                # .pem format private key (unencrypted). Default None
 
-# Required if using Basic/Digest Auth
-authUser:
+# Required if using Basic/Digest Auth (Default None)
+authUser:             
 authPass:
 
-# Required if using OAuth1 auth
+# Required if using OAuth1 auth (Default None)
 oauth1_app_key:
 oauth1_app_secret:
 oauth1_user_token:
