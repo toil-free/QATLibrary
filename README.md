@@ -22,7 +22,7 @@ python setup.py install
 ## Execution
 Using CLI (standalone)
 ```shell
-qat -c config.yaml -f Tests.csv 
+qat -c sample/config.yaml -f sample/Tests.csv 
 ```
 
 CLI Help
@@ -78,11 +78,14 @@ oauth1_app_secret:
 oauth1_user_token:
 oauth1_user_token_secret:
 ```
-* [CSV Test Data](sample/Tests.csv): Test cases/data file. Test cases gets generated based on this file's data
+* [CSV Test Data](sample/Tests.csv): Test cases/data file. Test cases gets generated based on this file's data 
+using Robot Framework. 
 
 
 ## Contributing
-This is [Sharif Rahman](https://www.linkedin.com/in/sharif-rahman/). 
+This is [Sharif](https://www.linkedin.com/in/sharif-rahman/). I started this project to basically make my life 
+a bit easier around simple REST API tests. This project is ideal for you if want to get some automated tests done 
+quickly for your projects without coding or inter-dependent REST API Calls. 
 
 QATLibrary is on [GitHub](https://github.com/sharif314/QATLibrary). 
 Get in touch, via GitHub or otherwise, if you've got something to contribute, it'd be most welcome! 

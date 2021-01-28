@@ -1,7 +1,9 @@
 .idea
+.eggs
 dist
 build
 venv
 src/QATLibrary.egg-info
 src/QATLibrary/__pycache__
-
+*.html
+*.xml
