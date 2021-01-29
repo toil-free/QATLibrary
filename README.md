@@ -1,36 +1,50 @@
 # QATLibrary 
 QAT (Quick API Tests) Library is a Data/Configuration Driven REST API Test Automation Library. 
 Can be used as a Robot Framework Library or as standalone tool (CLI). This tool does not solve complex 
-REST API automation scenarios, however, provides a quick, lightweight and data-driven approach to validate 
-REST API tests. If you need complex flows for your tests, please use the library with Robot Framework where 
-custom keywords can be used with (dynamically) generated tests by QATLibrary.
+REST API automation scenarios, rather, provides a simple, lightweight and data-driven approach to create  
+automated REST API tests quickly. For complex flows, it is recommended to use the library with Robot 
+Framework. 
 
-## Getting Started
-### Pre-reqs:
-* Python >= 3.6
+## Features
+* No coding required. Quick and easy implementation for REST API Tests. 
+* Run from CLI (CI/CD friendly).
+* Store Test Data, Documentation and Assertions in CSV File. 
+* Authorization: Basic, Digest, OAuth1
+* Run as a Robot Framework Library with Dynamic Test Generation Support. 
+* Supports all HTTP Methods, SSL Certificates, Proxy Server, Stream, Redirection, Request Timeout etc.
+* Robot Framework based execution, reports and logs (CLI or Library). 
 
-### Install QATLibrary
+### Assertions
+* Status Code
+* JSON Schema
+* Response Body 
+* Response Headers
+* Response Time/SLA
+* Server Certificate
+
+
+## Install QATLibrary
 Using Pip:
 ```shell 
 pip install qatlibrary
 ```
-From source:
+From Source:
 ```shell 
 python setup.py install
 ```
 
 ## Execution
-Using CLI (standalone)
+Using CLI (standalone):
 ```shell
 qat -c sample/config.yaml -f sample/Tests.csv 
 ```
 
-CLI Help
+CLI Help:
 ```shell
 qat --help
 ```
 
-## As Robot Framework Library
+## Use as Robot Framework Library
 Example:
 
 ```robot
@@ -53,7 +67,7 @@ Place Holder Test
 ## Configurations and Test Data
 QATLibrary requires a CSV file with required data to drive the tests. Config yaml or .py files can inject your desired
 configurations during runtime.
-* [Sample Config Yaml](sample/config.yaml): Required to inject runtime configurations
+* [Sample Config Yaml](https://github.com/sharif314/QATLibrary/sample/config.yaml): Required to inject runtime configurations
 ```yaml
 host: httpbin.org           # Required
 
@@ -78,14 +92,14 @@ oauth1_app_secret:
 oauth1_user_token:
 oauth1_user_token_secret:
 ```
-* [CSV Test Data](sample/Tests.csv): Test cases/data file. Test cases gets generated based on this file's data 
+* [CSV Test Data](https://github.com/sharif314/QATLibrary/sample/Tests.csv): Test cases/data file. Test cases gets generated based on this file's data 
 using Robot Framework. 
 
 
 ## Contributing
-This is [Sharif](https://www.linkedin.com/in/sharif-rahman/). I started this project to basically make my life 
+This is [Sharif](https://www.linkedin.com/in/sharif-rahman/). I started this project basically to make my life 
 a bit easier around simple REST API tests. This project is ideal for you if want to get some automated tests done 
-quickly for your projects without coding or inter-dependent REST API Calls. 
+quickly for your projects without coding and powerful assertion methods out of the box. 
 
 QATLibrary is on [GitHub](https://github.com/sharif314/QATLibrary). 
 Get in touch, via GitHub or otherwise, if you've got something to contribute, it'd be most welcome! 

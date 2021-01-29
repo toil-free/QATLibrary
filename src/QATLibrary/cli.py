@@ -28,7 +28,7 @@ def main():
 
     parser.add_argument('-c', '--config',
                         help='Config yaml file with required settings',
-                        required=True, type=str)
+                        required=False, type=str)
 
     parser.add_argument('-e', '--encoding',
                         help='Encoding for CSV Input File',
