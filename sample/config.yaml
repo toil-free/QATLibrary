@@ -1,8 +1,8 @@
 ---
-host: httpbin.org           # Required
-
 #optional args
-timeout: 5                  # Default 5 seconds
+host: httpbin.org           # Default localhost
+
+timeout: 10                 # Default 5 seconds
 allow_redirects:            # Allow Redirects. Default True. 
 stream:                     # True/False. 
 http_proxy:                 # HTTP Proxy. Default None. 

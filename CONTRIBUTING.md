@@ -22,7 +22,7 @@ Pull requests are the best way to propose changes to the codebase
 We actively welcome your pull requests:
 
 1. Increase the version numbers in any examples files, and the README.md to the new version that this
-   Pull Request would represent. The versioning scheme we use is [CalVer](https://calver.org/).
+   Pull Request would represent. The versioning scheme we use is [CalVer](https://calver.org/). Format is yy.mm.minor.
 2. Update the README.md with details of changes to the interface, this includes new environment
    variables, configurations or schema change.
 3. All changes must be backward compatible (unless absolutely avoidable) or discussed ahead of implementation.
