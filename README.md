@@ -1,7 +1,7 @@
 # QATLibrary 
 QAT (Quick API Tests) Library is a Data/Configuration Driven REST API Test Automation Library. 
 Can be used as a Robot Framework Library or as standalone tool (CLI). This tool does not solve complex 
-REST API automation scenarios, rather, provides a simple, lightweight and data-driven approach to create  
+REST API automation scenarios, rather, provides a simple, lightweight and data-driven approach to create 
 automated REST API tests quickly. For complex flows, it is recommended to use the library with Robot 
 Framework. 
 
