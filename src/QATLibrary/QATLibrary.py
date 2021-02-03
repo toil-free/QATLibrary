@@ -142,7 +142,7 @@ class QATLibrary(object):
     """ Setup Request URL """
 
     def __set_url(self, data):
-        url = data['protocol'].lower() + '://' + self.builtin.get_variable_value('${host}') or 'localhost'
+        url = (data['protocol'] or 'http').lower() + '://' + self.builtin.get_variable_value('${host}') or 'localhost'
         if data['port']:
             url += ':' + data['port']
         url += data['endPoint']
@@ -240,7 +240,7 @@ class QATLibrary(object):
         expected_http_status = int(data['statusCode']) or 200
         if response.status_code != expected_http_status:
             raise AssertionError("Expected status code: " + data['statusCode'] +
-                            " but actual status code: " + str(response.status_code))
+                                 " but actual status code: " + str(response.status_code))
         logger.info('Received Expected HTTP Status Code')
 
     """ Validate JSON Schema """
@@ -316,10 +316,9 @@ class QATLibrary(object):
 
     @staticmethod
     def __assert_sla(response, data, err):
-        rspSLA = float(data['rspSLA'])
-        actualRspTime = response.elapsed.total_seconds() * 1000
-
-        if rspSLA:
+        if data['rspSLA']:
+            rspSLA = float(data['rspSLA'])
+            actualRspTime = response.elapsed.total_seconds() * 1000
             if rspSLA < actualRspTime:
                 err.append(
                     'Expected Response SLA: ' + str(rspSLA) + '(ms) but actual was: ' + str(actualRspTime) + '(ms)')
