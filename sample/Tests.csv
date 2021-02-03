@@ -805,7 +805,7 @@ POST Request with XML Body,Y,JIRA-13,Jane Doe,,My Test Case Should Run,https,443
         }
     },
     ""additionalProperties"": true
-}","""origin"": ""75.22.161.77""","Error, Failed",,
+}",,"Error, Failed",,
 PUT Request Should Fail with 405 Error,Y,JIRA-14,Jane Doe,,HTTPBin should return 405,https,443,/post,PUT,,"{
 	""content-type"": ""application/json;charset=UTF-8"",
 	""Connection"": ""keep-alive"",
