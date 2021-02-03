@@ -4,6 +4,7 @@ from robot.output import LOGGER, pyloggingconf
 from robot.api import ResultWriter
 from pathlib import Path
 import argparse
+import sys
 from .version import VERSION
 
 
@@ -57,6 +58,11 @@ def main():
                         help='Output xml file name',
                         required=False, type=str)
 
+    parser.add_argument('-rc', '--return_rc',
+                        action='store_true',
+                        help='Return error status code for test failures',
+                        required=False)
+
     args = parser.parse_args()
     create_test_suite(args)
 
@@ -82,6 +88,9 @@ def create_test_suite(args):
             writer = ResultWriter(settings.output if settings.log
                                   else result)
             writer.write_results(settings.get_rebot_settings())
+
+    if args.return_rc:
+        sys.exit(result.return_code)
 
 
 if __name__ == '__main__':
