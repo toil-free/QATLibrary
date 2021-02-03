@@ -142,7 +142,8 @@ class QATLibrary(object):
     """ Setup Request URL """
 
     def __set_url(self, data):
-        url = (data['protocol'] or 'http').lower() + '://' + self.builtin.get_variable_value('${host}') or 'localhost'
+        url = (data['protocol'] or 'http').lower() + '://' + \
+              self.builtin.get_variable_value('${host}', default='localhost')
         if data['port']:
             url += ':' + data['port']
         url += data['endPoint']

@@ -67,7 +67,10 @@ Place Holder Test
 ## Configurations and Test Data
 QATLibrary requires a CSV file with required data to drive the tests. Config yaml or .py files can inject your desired
 configurations during runtime.
-* [Sample Config Yaml](https://github.com/sharif314/QATLibrary/sample/config.yaml): Required to inject runtime configurations
+* [CSV Test Data](https://github.com/sharif314/QATLibrary/blob/main/sample/Tests.csv): Test cases/data file. Test cases gets generated based on this file's data 
+using Robot Framework. 
+
+* [Sample Config YAML](https://github.com/sharif314/QATLibrary/blob/main/sample/config.yaml): Required to inject runtime configurations
 ```yaml
 host: httpbin.org           # Required
 
@@ -92,8 +95,7 @@ oauth1_app_secret:
 oauth1_user_token:
 oauth1_user_token_secret:
 ```
-* [CSV Test Data](https://github.com/sharif314/QATLibrary/sample/Tests.csv): Test cases/data file. Test cases gets generated based on this file's data 
-using Robot Framework. 
+
 
 
 ## Contributing
@@ -103,7 +105,7 @@ quickly for your projects without coding and powerful assertion methods out of t
 
 QATLibrary is on [GitHub](https://github.com/sharif314/QATLibrary). 
 Get in touch, via GitHub or otherwise, if you've got something to contribute, it'd be most welcome! 
-Please follow the [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+Please follow the [CONTRIBUTING.md](https://github.com/sharif314/QATLibrary/blob/main/CONTRIBUTING.md) for detailed guidelines.
 
 ## License 
-QATLibrary is open source software provided under the MIT License. Please follow [LICENSE.md](LICENSE.md) for more details. 
+QATLibrary is open source software provided under the MIT License. Please follow [LICENSE.md](https://github.com/sharif314/QATLibrary/blob/main/LICENSE.md) for more details. 
