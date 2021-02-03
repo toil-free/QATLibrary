@@ -10,10 +10,8 @@ from .version import VERSION
 
 def input_csv(arg_value):
     if '.csv' not in arg_value:
-        print('in csv validation')
         raise argparse.ArgumentTypeError('-f or --file value must be a .csv file')
     if not Path(arg_value).is_file():
-        print('in file validation')
         raise argparse.ArgumentTypeError('csv input file does not exist: ' + arg_value)
     return arg_value
 
@@ -23,13 +21,16 @@ def main():
     parser.add_argument('--version', action="version",
                         version=VERSION,
                         help='QAT library version')
+
     parser.add_argument('-f', '--file',
-                        help='CSV File Input. Relative/absolute path accepted',
+                        help='CSV File Input. Relative/absolute path accepted. '
+                             'If not provided default value is Qatfile.csv in current directory',
+                        # default='Qatfile.csv',
                         required=True, type=input_csv)
 
     parser.add_argument('-c', '--config',
-                        help='Config yaml file with required settings',
-                        required=False, type=str)
+                        help='Config yaml file with required settings or variables. ',
+                        required=True, type=str)
 
     parser.add_argument('-e', '--encoding',
                         help='Encoding for CSV Input File',
