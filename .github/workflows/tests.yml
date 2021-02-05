@@ -1,5 +1,5 @@
 ---
-name: TEST
+name: Test
 on:
   push:
   pull_request:
@@ -32,7 +32,7 @@ jobs:
         pip install dist/$(ls dist | grep -i .whl)
         qat --version
 
- - name: Init QAT Sample Files
+    - name: Init QAT Sample Files
       run: |
         qat init
 
