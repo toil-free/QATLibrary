@@ -7,8 +7,9 @@ import argparse
 import sys
 import os
 import platform
-from termcolor import cprint
+from termcolor import *
 from .version import VERSION
+
 
 ACTIONS = ['init', 'clean', 'run']
 CONFIG_FILE_NAME = 'config.yaml'
@@ -17,7 +18,7 @@ INTRO = '=' * 78
 
 
 def print_qat_cli_intro(args):
-    """Prints LightHouse Execution Intro."""
+    """Prints QAT Execution Intro."""
     os.system('cls' if os.name == 'nt' else 'clear')
     cprint(INTRO, 'green')
     cprint('Executing QATLibrary Tests', 'green')
@@ -30,6 +31,13 @@ def print_qat_cli_intro(args):
     print("Report           : %s" % args.report)
     print("Log              : %s" % args.log)
     cprint(INTRO, 'green')
+
+
+def colored_msg(msg, color=None):
+    if os.name == 'nt':
+        print(msg)
+    else:
+        cprint(msg, color)
 
 
 def isFile(arg_value):
@@ -59,7 +67,7 @@ def _clean(target_dir):
         if file_name.endswith(report_exts):
             print('Removing file: ', os.path.join(target_dir, file_name))
             os.remove(os.path.join(target_dir, file_name))
-    cprint('Cleanup complete!', 'green')
+    colored_msg('Cleanup complete!', 'green')
 
 
 def _init():
@@ -77,9 +85,9 @@ def _create_template_file(file_name, file_content):
     if not Path(file_name).is_file():
         with open(file_name, "w") as file:
             file.write(file_content)
-        cprint('==> QAT sample file created: ' + file_name, 'green')
+        colored_msg('==> QAT sample file created: ' + file_name, 'green')
     else:
-        cprint('==> Skipping... File exists: ' + file_name, 'yellow')
+        colored_msg('==> Skipping... File exists: ' + file_name, 'yellow')
 
 
 def _create_test_suite(args):
