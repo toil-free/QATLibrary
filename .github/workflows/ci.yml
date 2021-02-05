@@ -1,5 +1,5 @@
 ---
-name: QATLibrary Pipeline
+name: QATLibrary CI
 on: push
 
 jobs:
@@ -28,9 +28,13 @@ jobs:
         pip install dist/$(ls dist | grep -i .whl)
         qat --version
 
+    - name: Init QAT Sample Files
+      run: |
+        qat init
+
     - name: Run QATLibrary CLI Tests
       run: |
-        qat -f sample/Tests.csv -c sample/config.yaml -rc
+        qat run -f TestCases.csv -c config.yaml -rc
 
     - name: Twine check dist
       run: |
