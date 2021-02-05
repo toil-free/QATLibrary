@@ -1,4 +1,11 @@
 # QATLibrary 
+![gh ci](https://github.com/sharif314/QATLibrary/workflows/QATLibrary%20CI/badge.svg)
+![gh tests](https://github.com/sharif314/QATLibrary/workflows/TEST/badge.svg)
+[![PyPI version](https://badge.fury.io/py/QATLibrary.svg)](https://badge.fury.io/py/QATLibrary)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-Yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+
 QAT (Quick API Tests) Library is a Data/Configuration Driven REST API Test Automation Library. 
 Can be used as a Robot Framework Library or as standalone tool (CLI). This tool does not solve complex 
 REST API automation scenarios, rather, provides a simple, lightweight and data-driven approach to create 
@@ -7,6 +14,7 @@ Framework.
 
 ## Features
 * No coding required. Quick and easy implementation for REST API Tests. 
+* Initialize sample config and Test Data with a single command. 
 * Run from CLI (CI/CD friendly).
 * Store Test Data, Documentation and Assertions in CSV File. 
 * Authorization: Basic, Digest, OAuth1
@@ -33,13 +41,29 @@ From Source:
 python setup.py install
 ```
 
-## Execution
-Using CLI (standalone):
-```shell
-qat -c sample/config.yaml -f sample/Tests.csv 
+## Generate Sample Test Data CSV and Config YAML 
+From CLI run:
+```shell 
+qat init
 ```
 
-CLI Help:
+## Execution
+Execute Tests Using CLI (standalone):
+```shell
+qat run -c config.yaml -f TestCases.csv
+```
+
+Clean report files (*.html and *.xml) in current directory:
+```shell
+qat clean
+```
+
+Clean report files (*.html and *.xml) in a directory (absolute or relative):
+```shell
+qat clean -d path/to/dir
+```
+
+CLI Help (shows all required and optional args, usage etc):
 ```shell
 qat --help
 ```
