@@ -62,6 +62,17 @@ def _clean(target_dir):
     cprint('Cleanup complete!', 'green')
 
 
+def _init():
+    from .templates import CONFIG_FILE_CONTENT, CSV_DATA_FILE_CONTENT
+
+    print('Initializing QAT Sample files..')
+    _create_template_file(CONFIG_FILE_NAME, CONFIG_FILE_CONTENT)
+    _create_template_file(CSV_DATA_FILE_NAME, CSV_DATA_FILE_CONTENT)
+    print(f"""
+You may run: 
+    qat run -f { CSV_DATA_FILE_NAME } -c { CONFIG_FILE_NAME } """)
+
+
 def _create_template_file(file_name, file_content):
     if not Path(file_name).is_file():
         with open(file_name, "w") as file:
@@ -153,6 +164,9 @@ def main():
     args = parser.parse_args()
     if args.action == 'clean':
         _clean(args.directory)
+
+    if args.action == 'init':
+        _init()
 
     if args.action == 'run':
         _create_test_suite(args)
