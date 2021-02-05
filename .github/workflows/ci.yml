@@ -1,6 +1,9 @@
 ---
-name: QATLibrary Pipeline
-on: push
+name: QATLibrary CI
+on:
+  push:
+    paths:
+    - 'src/**'
 
 jobs:
   build-n-publish:
