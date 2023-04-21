@@ -52,11 +52,11 @@ class QATLibrary(object):
                     tc = self.current_suite.tests.create(name=testCase['testName'] or 'Untitled Test',
                                                          tags=self.__setup_test_tags(testCase),
                                                          doc=self.__setup_test_documentation(testCase))
-                    tc.keywords.create(name='Data Driven HTTP Request',
+                    tc.body.create_keyword(name='Data Driven HTTP Request',
                                        args=[testCase])
 
                     if kwname is not None:
-                        tc.keywords.create(name=kwname, args=args)
+                        tc.body.create_keyword(name=kwname, args=args)
             logger.info('Dynamic Tests Creation Successful!')
         except Exception as e:
             logger.error(e)
