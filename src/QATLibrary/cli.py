@@ -96,7 +96,7 @@ def _create_test_suite(args):
                       doc='Runs (Quick) API Tests from Input CSV Data')
     suite.resource.imports.library('QATLibrary')
 
-    suite.keywords.create('QAT Dynamic Tests Setup', args=[args.file, args.encoding], type='setup')
+    suite.setup.config(name='QAT Dynamic Tests Setup', args=[args.file, args.encoding])
     settings = RobotSettings(output=args.output,
                              report=args.report,
                              loglevel=args.loglevel,
