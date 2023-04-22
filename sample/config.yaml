@@ -13,7 +13,7 @@ certificate:                # .pem format certificate. Default None
 private_key:                # .pem format private key (unencrypted). Default None
 
 # Required if using Basic/Digest Auth (Default None)
-authUser:             
+authUser:
 authPass:
 
 # Required if using OAuth1 auth (Default None)
@@ -21,3 +21,18 @@ oauth1_app_key:
 oauth1_app_secret:
 oauth1_user_token:
 oauth1_user_token_secret:
+
+## bearer auth
+#bearer_auth:
+#  token_url:
+#  payload:
+#    client_id:
+#    client_secret:
+#    scope:
+#    grant_type:
+#  # TODO: add TLS context
+
+# global headers
+headers:
+  user-agent: QATLibrary
+  X-correlation-id: ${str(__import__('uuid').uuid4())}
