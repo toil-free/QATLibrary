@@ -1,6 +1,7 @@
 from __future__ import print_function
 import csv
 import json
+import re
 from robot.libraries.BuiltIn import BuiltIn
 from robot.api import logger
 from robot.api.deco import keyword
@@ -14,9 +15,11 @@ import ssl
 from requests.adapters import HTTPAdapter
 from urllib3.poolmanager import PoolManager
 
+
 class QATLibrary(object):
     ROBOT_LISTENER_API_VERSION = 3
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
+    HEADER_VAR_EXP = re.compile(r"\${[^}]*}")
 
     def __init__(self):
         self.ROBOT_LIBRARY_LISTENER = self
@@ -47,13 +50,18 @@ class QATLibrary(object):
         data = self.__generate_dict_data_from_csv(csvFile=csvFile, encoding=encoding)
 
         try:
+            tc = self.current_suite.tests.create(name='Setup Global Test Variables',
+                                                 tags='SYSTEM',
+                                                 doc='Sets up injectable variables if required')
+            tc.body.create_keyword(name='Setup Global Vars')
+
             for testCase in data:
                 if testCase['execute'] not in ['N', 'False', 'false']:
                     tc = self.current_suite.tests.create(name=testCase['testName'] or 'Untitled Test',
                                                          tags=self.__setup_test_tags(testCase),
                                                          doc=self.__setup_test_documentation(testCase))
                     tc.body.create_keyword(name='Data Driven HTTP Request',
-                                       args=[testCase])
+                                           args=[testCase])
 
                     if kwname is not None:
                         tc.body.create_keyword(name=kwname, args=args)
@@ -61,6 +69,14 @@ class QATLibrary(object):
         except Exception as e:
             logger.error(e)
             raise Exception('Dynamic Tests creation failed!')
+
+    @keyword
+    def setup_global_vars(self):
+        if self.builtin.get_variable_value('${bearer_auth}'):
+            bearer_token = requests.post(
+                url=self.builtin.get_variable_value('${bearer_auth.token_url}'),
+                data=self.builtin.get_variable_value('${bearer_auth.payload}')).json()['access_token']
+            self.builtin.set_global_variable('${BEARER_AUTH}', {'Authorization': f'Bearer {bearer_token}'})
 
     @keyword('Data Driven HTTP Request')
     def qat_data_driven_http_request(self, data):
@@ -89,6 +105,7 @@ class QATLibrary(object):
         self.__assert_response(response, data)
 
     """ Setup Configurations """
+
     @staticmethod
     def __generate_dict_data_from_csv(csvFile, encoding='utf-8'):
         """ Takes CSV file. Default encoding for CSV is utf-8,
@@ -152,7 +169,20 @@ class QATLibrary(object):
     """ Setup Headers """
 
     def __set_headers(self, data):
-        return self.__get_dict(data['reqHeaders'])
+        # add bearer auth if available
+        global_headers = self.builtin.get_variable_value('${BEARER_AUTH}', {})
+
+        # process global headers
+        config_headers = self.builtin.get_variable_value('${headers}', {})
+        if config_headers:
+            for k, v in config_headers.items():
+                global_headers[k] = eval(re.sub(r'\${(.*?)}', r'\1', v)) if self.HEADER_VAR_EXP.search(v) else v
+
+        # check for user defined headers
+        usr_def_headers = self.__get_dict(data['reqHeaders'])
+        if usr_def_headers:
+            return dict(global_headers.items() | usr_def_headers.items())
+        return global_headers
 
     """ Setup Request Parameters """
 
@@ -219,6 +249,7 @@ class QATLibrary(object):
             raise AssertionError(pprint.pformat(err, indent=2))
 
     """ Get JSON String to Dict """
+
     @staticmethod
     def __get_dict(jsonData, default=None):
         if bool(jsonData):
@@ -226,6 +257,7 @@ class QATLibrary(object):
         return default
 
     """ Get list items from String or JSON. Only takes values from { "values": [] } or comma separated strings """
+
     @staticmethod
     def __get_values_from_json_or_string(data, key, delimeter=None):
         try:
