@@ -1,17 +1,17 @@
 from __future__ import print_function
+
 import csv
 import json
 import re
+import requests
+import pprint
+import ssl
+
 from robot.libraries.BuiltIn import BuiltIn
 from robot.api import logger
 from robot.api.deco import keyword
-import requests
 from requests import Request, Session
-from requests.auth import HTTPDigestAuth
 from jsonschema import validate, exceptions
-import pprint
-
-import ssl
 from requests.adapters import HTTPAdapter
 from urllib3.poolmanager import PoolManager
 
@@ -30,12 +30,7 @@ class QATLibrary(object):
         self.allow_redirects = BuiltIn().get_variable_value(name='${allow_redirects}', default=True)
         self.stream = BuiltIn().get_variable_value(name='${stream}', default=False)
         self.proxy = BuiltIn().get_variable_value(name='${proxy}', default=None)
-        self.authUser = BuiltIn().get_variable_value(name='${authUser}', default=None)
-        self.authPass = BuiltIn().get_variable_value(name='${authPass}', default=None)
-        self.oauth1_app_key = BuiltIn().get_variable_value(name='${oauth1_app_key}', default=None)
-        self.oauth1_app_secret = BuiltIn().get_variable_value(name='${oauth1_app_secret}', default=None)
-        self.oauth1_user_token = BuiltIn().get_variable_value(name='${oauth1_user_token}', default=None)
-        self.oauth1_user_token_secret = BuiltIn().get_variable_value(name='${oauth1_user_token_secret}', default=None)
+
         self.verify = BuiltIn().get_variable_value('${verify_server_cert}', default=True)
         self.certificate = BuiltIn().get_variable_value('${certificate}', default=None)
         self.private_key = BuiltIn().get_variable_value('${private_key}', default=None)
@@ -46,22 +41,22 @@ class QATLibrary(object):
         self.current_suite = suite
 
     @keyword('QAT Dynamic Tests Setup')
-    def qat_dynamic_tests_setup(self, csvFile, encoding='utf-8', kwname=None, *args):
-        data = self.__generate_dict_data_from_csv(csvFile=csvFile, encoding=encoding)
+    def qat_dynamic_tests_setup(self, csv_file, encoding='utf-8', kwname=None, *args):
+        data = self.__generate_dict_data_from_csv(csv_file=csv_file, encoding=encoding)
 
         try:
             tc = self.current_suite.tests.create(name='Setup Global Test Variables',
                                                  tags='SYSTEM',
                                                  doc='Sets up injectable variables if required')
-            tc.body.create_keyword(name='Setup Global Vars')
+            tc.body.create_keyword(name='Setup Global Vars', args=[data])
 
-            for testCase in data:
-                if testCase['execute'] not in ['N', 'False', 'false']:
-                    tc = self.current_suite.tests.create(name=testCase['testName'] or 'Untitled Test',
-                                                         tags=self.__setup_test_tags(testCase),
-                                                         doc=self.__setup_test_documentation(testCase))
+            for i, test_case in enumerate(data, 0):
+                if test_case['execute'] not in ['N', 'False', 'false']:
+                    tc = self.current_suite.tests.create(name=test_case['testName'] or 'Untitled Test',
+                                                         tags=self.__setup_test_tags(test_case),
+                                                         doc=self.__setup_test_documentation(test_case))
                     tc.body.create_keyword(name='Data Driven HTTP Request',
-                                           args=[testCase])
+                                           args=["${data}" + f'[{i}]'])
 
                     if kwname is not None:
                         tc.body.create_keyword(name=kwname, args=args)
@@ -71,7 +66,11 @@ class QATLibrary(object):
             raise Exception('Dynamic Tests creation failed!')
 
     @keyword
-    def setup_global_vars(self):
+    def setup_global_vars(self, data):
+        # setup data source
+        self.builtin.set_global_variable('${data}', data)
+
+        # set bearer token if configured
         if self.builtin.get_variable_value('${bearer_auth}'):
             bearer_token = requests.post(
                 url=self.builtin.get_variable_value('${bearer_auth.token_url}'),
@@ -90,9 +89,8 @@ class QATLibrary(object):
                                                   headers=self.__set_headers(data),
                                                   params=self.__set_params(data),
                                                   data=self.__set_payload(data),
-                                                  cookies=self.__set_cookies(data),
-                                                  auth=self.__set_auth(data)))
-        self.__log_prepped_request(prepped, data, encoding='utf-8')
+                                                  cookies=self.__set_cookies(data)))
+        self.__log_prepped_request(prepped, data)
         response = session.send(prepped,
                                 allow_redirects=self.allow_redirects,
                                 stream=self.stream,
@@ -107,46 +105,30 @@ class QATLibrary(object):
     """ Setup Configurations """
 
     @staticmethod
-    def __generate_dict_data_from_csv(csvFile, encoding='utf-8'):
+    def __generate_dict_data_from_csv(csv_file, encoding='utf-8'):
         """ Takes CSV file. Default encoding for CSV is utf-8,
         override the correct encoding while invoking this method."""
         data = []
 
-        with open(csvFile, encoding=encoding) as csvFile:
-            csv_reader = csv.DictReader(csvFile)
+        with open(csv_file, encoding=encoding) as csv_file:
+            csv_reader = csv.DictReader(csv_file)
             for row in csv_reader:
                 data.append(row)
         return data
 
     @staticmethod
-    def __setup_test_documentation(testCase):
-        if testCase['documentation'] and testCase['testId']:
-            return '[' + testCase['testId'] + '] ' + testCase['documentation']
+    def __setup_test_documentation(test_case):
+        if test_case['documentation'] and test_case['testId']:
+            return '[' + test_case['testId'] + '] ' + test_case['documentation']
         else:
-            return testCase['documentation'] or ''
+            return test_case['documentation'] or ''
 
     @staticmethod
-    def __setup_test_tags(testCase):
-        if testCase['tags']:
-            return testCase['tags'].split(',')
+    def __setup_test_tags(test_case):
+        if test_case['tags']:
+            return test_case['tags'].split(',')
         else:
             return ['REST API', 'QAT']
-
-    def __set_auth(self, data):
-        if data['authType'].lower() == 'basic':
-            return (self.builtin.get_variable_value('${authUser}'),
-                    self.builtin.get_variable_value('${authPass}'))
-        elif data['authType'].lower() == 'digest':
-            return HTTPDigestAuth(self.builtin.get_variable_value('${authUser}'),
-                                  self.builtin.get_variable_value('${authPass}'))
-        elif data['authType'].lower() == 'oauth1':
-            from requests_oauthlib import OAuth1
-            return OAuth1(self.builtin.get_variable_value('${oauth1_app_key}'),
-                          self.builtin.get_variable_value('${oauth1_app_secret}'),
-                          self.builtin.get_variable_value('${oauth1_user_token}'),
-                          self.builtin.get_variable_value('${oauth1_user_token_secret}'))
-        else:
-            return None
 
     """ Setup Request Payload """
 
@@ -251,9 +233,9 @@ class QATLibrary(object):
     """ Get JSON String to Dict """
 
     @staticmethod
-    def __get_dict(jsonData, default=None):
-        if bool(jsonData):
-            return json.loads(jsonData)
+    def __get_dict(json_str, default=None):
+        if bool(json_str):
+            return json.loads(json_str)
         return default
 
     """ Get list items from String or JSON. Only takes values from { "values": [] } or comma separated strings """
@@ -305,18 +287,18 @@ class QATLibrary(object):
             logger.info('Running Response Body Assertions..')
 
             if data['rspShouldContain']:
-                validContents = self.__get_values_from_json_or_string(data=data,
-                                                                      key='rspShouldContain',
-                                                                      delimeter=',')
-                for content in validContents:
+                valid_contents = self.__get_values_from_json_or_string(data=data,
+                                                                       key='rspShouldContain',
+                                                                       delimeter=',')
+                for content in valid_contents:
                     if not content.strip() in response.text:
                         err.append('Response body does not contain expected: ' + content.strip())
 
             if data['rspShouldNotContain']:
-                invalidContents = self.__get_values_from_json_or_string(data=data,
-                                                                        key='rspShouldNotContain',
-                                                                        delimeter=',')
-                for content in invalidContents:
+                invalid_contents = self.__get_values_from_json_or_string(data=data,
+                                                                         key='rspShouldNotContain',
+                                                                         delimeter=',')
+                for content in invalid_contents:
                     if content.strip() in response.text:
                         err.append('Response body contains unexpected: ' + content.strip())
 
@@ -326,21 +308,21 @@ class QATLibrary(object):
     """ Validate Response Headers """
 
     def __assert_headers(self, response, data, err):
-        expectedHeaders = self.__get_dict(data['rspHeadersShouldContain'], default={})
-        unexpectedHeaders = self.__get_dict(data['rspHeadersShouldNotContain'], default={})
+        expected_headers = self.__get_dict(data['rspHeadersShouldContain'], default={})
+        unexpected_headers = self.__get_dict(data['rspHeadersShouldNotContain'], default={})
 
-        if expectedHeaders or unexpectedHeaders:
+        if expected_headers or unexpected_headers:
             logger.info('Running Response Headers assertions..')
-            if not all(header in response.headers.items() for header in expectedHeaders.items()):
+            if not all(header in response.headers.items() for header in expected_headers.items()):
                 logger.error(pprint.pformat(response.headers)
                              + ' Does not contain one or more expected headers: '
-                             + pprint.pformat(expectedHeaders))
+                             + pprint.pformat(expected_headers))
                 err.append('Response Headers missing expected value(s)')
 
-            if any(header in response.headers.items() for header in unexpectedHeaders.items()):
+            if any(header in response.headers.items() for header in unexpected_headers.items()):
                 logger.error(pprint.pformat(response.headers)
                              + ' contains one or more unexpected headers: '
-                             + pprint.pformat(unexpectedHeaders))
+                             + pprint.pformat(unexpected_headers))
                 err.append('Response Headers contains unexpected value(s)')
         else:
             logger.info('Skipping Response Headers Assertion')
@@ -350,11 +332,11 @@ class QATLibrary(object):
     @staticmethod
     def __assert_sla(response, data, err):
         if data['rspSLA']:
-            rspSLA = float(data['rspSLA'])
-            actualRspTime = response.elapsed.total_seconds() * 1000
-            if rspSLA < actualRspTime:
+            rsp_sla = float(data['rspSLA'])
+            rsp_time = response.elapsed.total_seconds() * 1000
+            if rsp_sla < rsp_time:
                 err.append(
-                    'Expected Response SLA: ' + str(rspSLA) + '(ms) but actual was: ' + str(actualRspTime) + '(ms)')
+                    'Expected Response SLA: ' + str(rsp_sla) + '(ms) but actual was: ' + str(rsp_time) + '(ms)')
             else:
                 logger.info('Response SLA Validation Successful')
         else:
@@ -362,9 +344,7 @@ class QATLibrary(object):
 
     """ Log Request """
 
-    def __log_prepped_request(self, prepped, data, encoding=None):
-        encoding = encoding or requests.utils.get_encoding_from_headers(prepped.headers)
-        # logger.trace(encoding)
+    def __log_prepped_request(self, prepped, data):
         body = None
         if prepped.body:
             try:
