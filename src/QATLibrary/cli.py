@@ -40,27 +40,27 @@ def colored_msg(msg, color=None):
         cprint(msg, color)
 
 
-def isFile(arg_value):
+def is_file(arg_value):
     if not Path(arg_value).is_file():
         raise argparse.ArgumentTypeError('File does not exist: ' + arg_value)
     return arg_value
 
 
-def isDir(arg_value):
+def is_dir(arg_value):
     if not Path(arg_value).is_dir():
         raise argparse.ArgumentTypeError('Directory does not exist: ' + arg_value)
     return arg_value
 
 
 def input_csv(arg_value):
-    isFile(arg_value)
+    is_file(arg_value)
     if '.csv' not in arg_value:
         raise argparse.ArgumentTypeError('-f or --file value must be a .csv file')
     return arg_value
 
 
 def _clean(target_dir):
-    report_exts=('.html', '.xml')
+    report_exts = ('.html', '.xml')
     target_files = os.listdir(target_dir)
 
     for file_name in target_files:
@@ -128,7 +128,7 @@ def main():
 
     parser.add_argument('-c', '--config',
                         help='Config yaml file with required settings or variables. ',
-                        required='run' in sys.argv, type=isFile)
+                        required='run' in sys.argv, type=is_file)
 
     parser.add_argument('-f', '--file',
                         help='CSV File Input. Relative/absolute path accepted.',
@@ -162,7 +162,7 @@ def main():
     parser.add_argument('-d', '--directory',
                         help='Target Directory for "init" or "clean". Default current directory.',
                         default=os.getcwd(),
-                        required=False, type=isDir)
+                        required=False, type=is_dir)
 
     parser.add_argument('-rc', '--return_rc',
                         action='store_true',
