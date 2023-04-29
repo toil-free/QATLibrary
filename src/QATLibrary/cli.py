@@ -1,15 +1,15 @@
+import argparse
+import sys
+import os
+import platform
+
 from robot.api import TestSuite
 from robot.conf import RobotSettings
 from robot.output import LOGGER, pyloggingconf
 from robot.api import ResultWriter
 from pathlib import Path
-import argparse
-import sys
-import os
-import platform
 from termcolor import *
 from .version import VERSION
-
 
 ACTIONS = ['init', 'clean', 'run']
 CONFIG_FILE_NAME = 'config.yaml'
@@ -71,23 +71,21 @@ def _clean(target_dir):
 
 
 def _init():
-    from .templates import CONFIG_FILE_CONTENT, CSV_DATA_FILE_CONTENT
+    _create_template_files()
 
-    print('Initializing QAT Sample files..')
-    _create_template_file(CONFIG_FILE_NAME, CONFIG_FILE_CONTENT)
-    _create_template_file(CSV_DATA_FILE_NAME, CSV_DATA_FILE_CONTENT)
+
+def _create_template_files():
+    import shutil
+    import pkg_resources
+    for f in os.listdir(pkg_resources.resource_filename('QATLibrary', 'templates')):
+        if not Path(f).is_file():
+            shutil.copy(pkg_resources.resource_filename('QATLibrary', f'templates/{f}'), f)
+            colored_msg('==> QAT sample file created: ' + f, 'green')
+        else:
+            colored_msg('==> Skipping... File exists: ' + f, 'yellow')
     print(f"""
-You may run: 
-    qat run -f { CSV_DATA_FILE_NAME } -c { CONFIG_FILE_NAME } """)
-
-
-def _create_template_file(file_name, file_content):
-    if not Path(file_name).is_file():
-        with open(file_name, "w") as file:
-            file.write(file_content)
-        colored_msg('==> QAT sample file created: ' + file_name, 'green')
-    else:
-        colored_msg('==> Skipping... File exists: ' + file_name, 'yellow')
+    You may run: 
+        qat run -c {CONFIG_FILE_NAME} -f {CSV_DATA_FILE_NAME} """)
 
 
 def _create_test_suite(args):
