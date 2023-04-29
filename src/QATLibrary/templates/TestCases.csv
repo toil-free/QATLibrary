@@ -1,37 +1,11 @@
-CONFIG_FILE_CONTENT = '''
----
-#optional args
-host: httpbin.org           # Default localhost
-
-timeout: 10                 # Default 5 seconds
-allow_redirects:            # Allow Redirects. Default True. 
-stream:                     # True/False. 
-http_proxy:                 # HTTP Proxy. Default None. 
-https_proxy:                # HTTPS Proxy. Default None.
-
-verify_server_cert: True    # True/False or path to CA Bundle. Default False. 
-certificate:                # .pem format certificate. Default None
-private_key:                # .pem format private key (unencrypted). Default None
-
-# Required if using Basic/Digest Auth (Default None)
-authUser:             
-authPass:
-
-# Required if using OAuth1 auth (Default None)
-oauth1_app_key:
-oauth1_app_secret:
-oauth1_user_token:
-oauth1_user_token_secret:
-'''
-
-CSV_DATA_FILE_CONTENT = '''testName,execute,testId,testOwner,tags,documentation,protocol,port,endPoint,reqType,authType,reqHeaders,reqCookies,reqFiles,reqParams,reqPayload,statusCode,rspSLA,jsonSchema,rspShouldContain,rspShouldNotContain,rspHeadersShouldContain,rspHeadersShouldNotContain
-GET Request without Headers,Y,JIRA-11,Jane Doe,"SMOKE, COHERENCE","Here goes my Test Documentation. E.g Expected result ""x"" should be equal to actual result ""y"". ",Https,,/get,GET,,,,,,,200,,,"""Host"": ""httpbin.org""","wrong, Failed, error, Error",,"{
+testName,execute,testId,testOwner,tags,documentation,protocol,port,endPoint,reqType,reqHeaders,reqCookies,reqFiles,reqParams,reqPayload,statusCode,rspSLA,jsonSchema,rspShouldContain,rspShouldNotContain,rspHeadersShouldContain,rspHeadersShouldNotContain
+GET Request without Headers,Y,JIRA-11,Jane Doe,"SMOKE, COHERENCE","Here goes my Test Documentation. E.g Expected result ""x"" should be equal to actual result ""y"". ",Https,,/get,GET,,,,,,200,,,"""Host"": ""httpbin.org""","wrong, Failed, error, Error",,"{
 	""invalidHeader"": ""unexpected""
 }"
-GET Request without Headers and Protocol,Y,JIRA-11,Jane Doe,"SMOKE, COHERENCE","Here goes my Test Documentation. E.g Expected result ""x"" should be equal to actual result ""y"". ",,,/get,GET,,,,,,,200,,,"""Host"": ""httpbin.org""","wrong, Failed, error, Error",,"{
+GET Request without Headers and Protocol,Y,JIRA-11,Jane Doe,"SMOKE, COHERENCE","Here goes my Test Documentation. E.g Expected result ""x"" should be equal to actual result ""y"". ",,,/get,GET,,,,,,200,,,"""Host"": ""httpbin.org""","wrong, Failed, error, Error",,"{
 	""invalidHeader"": ""unexpected""
 }"
-GET Request with Custom Headers,Y,JIRA-21,Jane Doe,"SMOKE, COHERENCE","Here goes my Test Documentation. E.g Expected result ""x"" should be equal to actual result ""y"". ",Https,,/get,GET,,"{
+GET Request with Custom Headers,Y,JIRA-21,Jane Doe,"SMOKE, COHERENCE","Here goes my Test Documentation. E.g Expected result ""x"" should be equal to actual result ""y"". ",Https,,/get,GET,"{
 	""content-type"": ""application/json;charset=UTF-8"",
 	""Connection"": ""keep-alive"",
 	""Accept"": ""application/json"",
@@ -42,7 +16,7 @@ GET Request with Custom Headers,Y,JIRA-21,Jane Doe,"SMOKE, COHERENCE","Here goes
 }","{
 	""invalidHeader"": ""unexpected""
 }"
-GET Request with Query Params,Y,JIRA-22,Jane Doe,"SMOKE, REGRESSION","Here goes my Test Documentation. E.g Expected result ""x"" should be equal to actual result ""y"". ",Https,,/get,GET,,"{
+GET Request with Query Params,Y,JIRA-22,Jane Doe,"SMOKE, REGRESSION","Here goes my Test Documentation. E.g Expected result ""x"" should be equal to actual result ""y"". ",Https,,/get,GET,"{
 	""content-type"": ""application/json;charset=UTF-8"",
 	""Connection"": ""keep-alive"",
 	""Accept"": ""application/json"",
@@ -54,7 +28,7 @@ GET Request with Query Params,Y,JIRA-22,Jane Doe,"SMOKE, REGRESSION","Here goes 
 }","{
 	""invalidHeader"": ""unexpected""
 }"
-GET Request with Cookies,Y,JIRA-26,Jane Doe,"SMOKE, REGRESSION","Here goes my Test Documentation. E.g Expected result ""x"" should be equal to actual result ""y"". ",Https,,/get,GET,,"{
+GET Request with Cookies,Y,JIRA-26,Jane Doe,"SMOKE, REGRESSION","Here goes my Test Documentation. E.g Expected result ""x"" should be equal to actual result ""y"". ",Https,,/get,GET,"{
 	""content-type"": ""application/json;charset=UTF-8"",
 	""Connection"": ""keep-alive"",
 	""Accept"": ""application/json"",
@@ -71,7 +45,7 @@ GET Request with Cookies,Y,JIRA-26,Jane Doe,"SMOKE, REGRESSION","Here goes my Te
 }","{
 	""invalidHeader"": ""unexpected""
 }"
-POST Request with JSON,Y,JIRA-12,John Doe,,My POST HTTP Request Should Succeed,https,443,/post,POST,,"{
+POST Request with JSON,Y,JIRA-12,John Doe,,My POST HTTP Request Should Succeed,https,443,/post,POST,"{
 	""content-type"": ""application/json;charset=UTF-8"",
 	""Connection"": ""keep-alive"",
 	""Accept"": ""application/json"",
@@ -90,7 +64,7 @@ POST Request with JSON,Y,JIRA-12,John Doe,,My POST HTTP Request Should Succeed,h
 	""content-type"": ""application/json"",
 	""Connection"": ""keep-alive""
 }",
-POST Request with XML Body,Y,JIRA-13,Jane Doe,,My Test Case Should Run,https,443,/post,POST,,"{
+POST Request with XML Body,Y,JIRA-13,Jane Doe,,My Test Case Should Run,https,443,/post,POST,"{
 	""content-type"": ""application/xml"",
 	""Connection"": ""keep-alive"",
 	""Accept"": ""application/json"",
@@ -102,19 +76,19 @@ POST Request with XML Body,Y,JIRA-13,Jane Doe,,My Test Case Should Run,https,443
    <Connection>keep-alive</Connection>
    <content-type>application/json;charset=UTF-8</content-type>
 </root>",200,1000,,,"Error, Failed",,
-PUT Request Should Fail with 405 Error,Y,JIRA-14,Jane Doe,,HTTPBin should return 405,https,443,/post,PUT,,"{
+PUT Request Should Fail with 405 Error,Y,JIRA-14,Jane Doe,,HTTPBin should return 405,https,443,/post,PUT,"{
 	""content-type"": ""application/json;charset=UTF-8"",
 	""Connection"": ""keep-alive"",
 	""Accept"": ""application/json"",
 	""Accept-Encoding"": ""gzip, deflate, br""
 }",,,,,405,1000,,Method Not Allowed,Success,,
-DELETE Request without Request Body,Y,JIRA-112,John Doe,,My Test Case Should Run,https,443,/delete,DELETE,,"{
+DELETE Request without Request Body,Y,JIRA-112,John Doe,,My Test Case Should Run,https,443,/delete,DELETE,"{
 	""content-type"": ""application/json;charset=UTF-8"",
 	""Connection"": ""keep-alive"",
 	""Accept"": ""application/json"",
 	""Accept-Encoding"": ""gzip, deflate, br""
 }",,,,,200,1000,,"""json"": null, ""form"": {}","Error, Failed",,
-DELETE Request with Request Body,Y,JIRA-114,John Doe,,My Test Case Should Run,https,443,/delete,DELETE,,"{
+DELETE Request with Request Body,Y,JIRA-114,John Doe,,My Test Case Should Run,https,443,/delete,DELETE,"{
 	""content-type"": ""application/json;charset=UTF-8"",
 	""Connection"": ""keep-alive"",
 	""Accept"": ""application/json"",
@@ -124,7 +98,7 @@ DELETE Request with Request Body,Y,JIRA-114,John Doe,,My Test Case Should Run,ht
 	""Connection"": ""keep-alive"",
 	""Accept"": ""application/json"",
 	""Accept-Encoding"": ""gzip, deflate, br""
-}",200,1000,"{
+}",200,4000,"{
     ""$schema"": ""http://json-schema.org/draft-07/schema"",
     ""$id"": ""http://example.com/example.json"",
     ""type"": ""object"",
@@ -275,4 +249,3 @@ DELETE Request with Request Body,Y,JIRA-114,John Doe,,My Test Case Should Run,ht
     },
     ""additionalProperties"": true
 }","""form"": {}","Error, Failed",,
-'''

@@ -1,0 +1,45 @@
+---
+# optional args; uncomment as-needed
+base_url: httpbin.org           # base url/server name. Default localhost
+timeout: 10                     # In seconds. Default 5 seconds
+allow_redirects: True           # Allow Redirects. Default True.
+stream: False                   # True/False. Default False.
+
+## global headers - these are added to every request from your data csv. All headers should be strings.
+headers:
+  user-agent: QATLibrary                                  # this is a static header
+  Authorization: Basic c29tZXVzZXI6bm90dmVyeXNlY3JldHBhc3M=
+  # dynamic headers can be added with ${} syntax like below -
+  X-correlation-id: ${str(__import__('uuid').uuid4())}         # dynamic headers use python's eval func.
+  random-digit: ${str(__import__('random').randint(0,99))}     # dynamic headers use python's eval func.
+
+
+## To enable proxies for http/https, enable the following config.
+#proxies:
+#  http_proxy:                   # HTTP proxy. Default None.
+#  https_proxy:                  # HTTPS proxy. Default None.
+#  no_proxy:                     # Bypass proxy
+
+## SSL/TLS configuration for REST API calls. Enable to configure.
+#tls:
+#  verify_server_cert: True      # True/False or path to CA Bundle. Default False.
+#  certificate:                  # .pem format certificate. Default None
+#  private_key:                  # .pem format private key (unencrypted). Default None.
+
+## Note that the specific details of how to obtain an access token may vary depending on the authentication scheme and API provider.
+## Be sure to check the API documentation for instructions on how to obtain an access token for your use case.
+## bearer auth / access token config. Enable below configs if required.
+
+#bearer_auth:
+#  token_url:                                # token_url for bearer auth
+#  payload:                                  # generic payload. supports all direct key/value. below are the common ones.
+#    client_id:
+#    client_secret:
+#    scope:
+#    grant_type:
+
+## Enable following block for bearer auth TLS config.
+#  tls:
+#    verify_server_cert: True       # True/False or path to CA Bundle. Default False.
+#    certificate:                  # .pem format certificate. Default None
+#    private_key:                  # .pem format private key (unencrypted). Default None
