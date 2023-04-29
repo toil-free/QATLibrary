@@ -5,15 +5,14 @@ import json
 import re
 import requests
 import pprint
-import ssl
 
 from robot.libraries.BuiltIn import BuiltIn
 from robot.api import logger
 from robot.api.deco import keyword
 from requests import Request, Session
 from jsonschema import validate, exceptions
-from requests.adapters import HTTPAdapter
-from urllib3.poolmanager import PoolManager
+
+from .TLSAdapter import TLSAdapter
 
 
 class QATLibrary(object):
@@ -21,21 +20,24 @@ class QATLibrary(object):
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
     HEADER_VAR_EXP = re.compile(r"\${[^}]*}")
 
+    # init session
+    session = Session()
+    session.mount('https://', TLSAdapter())
+
     def __init__(self):
         self.ROBOT_LIBRARY_LISTENER = self
         self.current_suite = None
 
         self.builtin = BuiltIn()
+        self.base_url = BuiltIn().get_variable_value(name='${base_url}', default='localhost')
         self.timeout = BuiltIn().get_variable_value(name='${timeout}', default=10)
         self.allow_redirects = BuiltIn().get_variable_value(name='${allow_redirects}', default=True)
         self.stream = BuiltIn().get_variable_value(name='${stream}', default=False)
-        self.proxy = BuiltIn().get_variable_value(name='${proxy}', default=None)
 
-        self.verify = BuiltIn().get_variable_value('${verify_server_cert}', default=True)
-        self.certificate = BuiltIn().get_variable_value('${certificate}', default=None)
-        self.private_key = BuiltIn().get_variable_value('${private_key}', default=None)
-        self.http_proxy = BuiltIn().get_variable_value('${http_proxy}', default=None)
-        self.https_proxy = BuiltIn().get_variable_value('${https_proxy}', default=None)
+        self.verify = BuiltIn().get_variable_value('${tls.verify_server_cert}', default=True)
+        self.certificate = BuiltIn().get_variable_value('${tls.certificate}', default=None)
+        self.private_key = BuiltIn().get_variable_value('${tls.private_key}', default=None)
+        self.proxies = BuiltIn().get_variable_value('${proxies}', default={})
 
     def _start_suite(self, suite, result):
         self.current_suite = suite
@@ -74,30 +76,35 @@ class QATLibrary(object):
         if self.builtin.get_variable_value('${bearer_auth}'):
             bearer_token = requests.post(
                 url=self.builtin.get_variable_value('${bearer_auth.token_url}'),
-                data=self.builtin.get_variable_value('${bearer_auth.payload}')).json()['access_token']
+                data=self.builtin.get_variable_value('${bearer_auth.payload}'),
+                proxies=self.proxies,
+                allow_redirects=self.allow_redirects,
+                stream=self.stream,
+                timeout=self.timeout,
+                cert=(self.builtin.get_variable_value('${bearer_auth.tls.private_key}'),
+                      self.builtin.get_variable_value('${bearer_auth.tls.key}')),
+                verify=self.builtin.get_variable_value('${bearer_auth.tls.verify_server_cert}', True)
+            ).json()['access_token']
             self.builtin.set_global_variable('${BEARER_AUTH}', {'Authorization': f'Bearer {bearer_token}'})
 
     @keyword('Data Driven HTTP Request')
     def qat_data_driven_http_request(self, data):
         logger.debug('Raw Test Data: ' + json.dumps(data, indent=2))
-        session = Session()
-        session.mount('https://', TLSAdapter())
-
         logger.debug('Preparing HTTP Request..')
-        prepped = session.prepare_request(Request(method=data['reqType'].upper(),
-                                                  url=self.__set_url(data),
-                                                  headers=self.__set_headers(data),
-                                                  params=self.__set_params(data),
-                                                  data=self.__set_payload(data),
-                                                  cookies=self.__set_cookies(data)))
+        prepped = self.session.prepare_request(Request(method=data['reqType'].upper(),
+                                                       url=self.__set_url(data),
+                                                       headers=self.__set_headers(data),
+                                                       params=self.__set_params(data),
+                                                       data=self.__set_payload(data),
+                                                       cookies=self.__set_cookies(data)))
         self.__log_prepped_request(prepped, data)
-        response = session.send(prepped,
-                                allow_redirects=self.allow_redirects,
-                                stream=self.stream,
-                                timeout=self.timeout,
-                                cert=self.__set_ssl_cert(),
-                                proxies=self.__set_proxy(),
-                                verify=self.__verify_server_cert())
+        response = self.session.send(prepped,
+                                     allow_redirects=self.allow_redirects,
+                                     stream=self.stream,
+                                     timeout=self.timeout,
+                                     cert=self.__set_ssl_cert(),
+                                     proxies=self.__set_proxy(),
+                                     verify=self.__verify_server_cert())
 
         self.__log_response(response)
         self.__assert_response(response, data)
@@ -142,7 +149,7 @@ class QATLibrary(object):
 
     def __set_url(self, data):
         url = (data['protocol'] or 'http').lower() + '://' + \
-              self.builtin.get_variable_value('${host}', default='localhost')
+              self.builtin.get_variable_value('${base_url}', default='localhost')
         if data['port']:
             url += ':' + data['port']
         url += data['endPoint']
@@ -199,13 +206,7 @@ class QATLibrary(object):
     """ Configure Proxies """
 
     def __set_proxy(self):
-        if self.http_proxy or self.https_proxy:
-            return {
-                'http': self.http_proxy,
-                'https': self.https_proxy
-            }
-        else:
-            return None
+        return self.proxies
 
     """ Configure Verify SSL Certs """
 
@@ -364,8 +365,7 @@ Stream: {self.stream}
 Verify Server Cert: {self.verify}
 SSL Certificate: {self.certificate}
 SSL Private Key: {self.private_key}
-HTTP Proxy: {self.http_proxy}
-HTTPS Proxy: {self.https_proxy}
+Proxies: {self.proxies}
 ----------------------------------------------------------------------------------
 [Request Headers]
 ----------------------------------------------------------------------------------
@@ -402,17 +402,6 @@ History: {response.history}
 {response.text}
 ==================================================================================
 """)
-
-
-class TLSAdapter(HTTPAdapter):
-    """Transport adapter that forces use of TLSv1.2.
-            All Tomcat Servers Require TLSv1.2 in DEV, QA, CTE or PROD environment."""
-
-    def init_poolmanager(self, connections, maxsize, block=False, **kwargs):
-        """Create and initialize the urllib3 PoolManager to use TLSv.12."""
-        self.poolmanager = PoolManager(
-            num_pools=connections, maxsize=maxsize,
-            block=block, ssl_version=ssl.PROTOCOL_TLSv1_2)
 
 
 globals()[__name__] = QATLibrary
