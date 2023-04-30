@@ -98,7 +98,8 @@ Test cases gets generated based on this file's content using Robot Framework.
 for tests. Can be utilize to accommodate various CI or Test environments. Please follow the inline comments for more details -  
     ```yaml
     ---
-    # optional args; uncomment as-needed
+    # optional args; uncomment as-needed. 
+    # Any block or k/v not required, recommended to keep commented out for reasonable defaults. 
     base_url: httpbin.org           # base url/server name. Default localhost
     timeout: 10                     # In seconds. Default 5 seconds
     allow_redirects: True           # Allow Redirects. Default True.
@@ -108,9 +109,9 @@ for tests. Can be utilize to accommodate various CI or Test environments. Please
     headers:
       user-agent: QATLibrary                                  # this is a static header
       Authorization: Basic c29tZXVzZXI6bm90dmVyeXNlY3JldHBhc3M=
-      # dynamic headers can be added with ${} syntax like below -
-      X-correlation-id: ${str(__import__('uuid').uuid4())}         # dynamic headers use python's eval func.
-      random-digit: ${str(__import__('random').randint(0,99))}     # dynamic headers use python's eval func.
+      # dynamic headers can be added with ${{ }} syntax like below -
+      X-correlation-id: ${{str(__import__('uuid').uuid4())}}         # dynamic headers use python's eval func.
+      random-digit: ${{str(__import__('random').randint(0,99))}}     # dynamic headers use python's eval func.
     
     
     ## To enable proxies for http/https, enable the following config.
@@ -142,6 +143,7 @@ for tests. Can be utilize to accommodate various CI or Test environments. Please
     #    verify_server_cert: True       # True/False or path to CA Bundle. Default False.
     #    certificate:                  # .pem format certificate. Default None
     #    private_key:                  # .pem format private key (unencrypted). Default None
+
    ```
 
 Once the files are generated, you can rename them according to your test suites or requirements.  
