@@ -18,7 +18,7 @@ from .TLSAdapter import TLSAdapter
 class QATLibrary(object):
     ROBOT_LISTENER_API_VERSION = 3
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
-    HEADER_VAR_EXP = re.compile(r"\${[^}]*}")
+    HEADER_VAR_EXP = re.compile(r"\$\{\{.*?\}\}")
 
     # init session
     session = Session()
@@ -165,7 +165,7 @@ class QATLibrary(object):
         config_headers = self.builtin.get_variable_value('${headers}', {})
         if config_headers:
             for k, v in config_headers.items():
-                global_headers[k] = eval(re.sub(r'\${(.*?)}', r'\1', v)) if self.HEADER_VAR_EXP.search(v) else v
+                global_headers[k] = eval(re.sub(r'\$\{\{(.*?)\}\}', r'\1', v)) if self.HEADER_VAR_EXP.search(v) else v
 
         # check for user defined headers
         usr_def_headers = self.__get_dict(data['reqHeaders'])

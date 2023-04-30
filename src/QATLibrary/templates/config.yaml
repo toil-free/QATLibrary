@@ -1,5 +1,6 @@
 ---
 # optional args; uncomment as-needed
+# Any block or k/v not required, recommended to keep commented out for reasonable defaults.
 base_url: httpbin.org           # base url/server name. Default localhost
 timeout: 10                     # In seconds. Default 5 seconds
 allow_redirects: True           # Allow Redirects. Default True.
@@ -9,9 +10,9 @@ stream: False                   # True/False. Default False.
 headers:
   user-agent: QATLibrary                                  # this is a static header
   Authorization: Basic c29tZXVzZXI6bm90dmVyeXNlY3JldHBhc3M=
-  # dynamic headers can be added with ${} syntax like below -
-  X-correlation-id: ${str(__import__('uuid').uuid4())}         # dynamic headers use python's eval func.
-  random-digit: ${str(__import__('random').randint(0,99))}     # dynamic headers use python's eval func.
+  # dynamic headers can be added with ${{ }} syntax like below -
+  X-correlation-id: ${{str(__import__('uuid').uuid4())}}         # dynamic headers use python's eval func.
+  random-digit: ${{str(__import__('random').randint(0,99))}}     # dynamic headers use python's eval func.
 
 
 ## To enable proxies for http/https, enable the following config.
